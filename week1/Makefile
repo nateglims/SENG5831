@@ -1,4 +1,4 @@
-PORT=/dev/tty.usbmodem1411
+PORT=/dev/tty.usbmodem*
 MCU=atmega32u4
 CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os
 LDFLAGS=-Wl,-gc-sections -Wl,-relax

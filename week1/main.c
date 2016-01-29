@@ -1,6 +1,8 @@
-#define F_CPU 16000000
 #include <stdint.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
+
+#define F_CPU 16000000
 #include <util/delay.h>
 
 uint8_t yellow_led = PORTC7;
@@ -10,17 +12,24 @@ void init();
 void set_green_led(uint8_t value);
 void set_yellow_led(uint8_t value);
 
+
 int main()
 {
     init();
     while(1)
     {
-        set_yellow_led(1);
+        while ((PINB & 0b00001001) != 0);
         set_green_led(1);
-        _delay_ms(5000);
-        set_yellow_led(0);
+        _delay_ms(10);
         set_green_led(0);
-        _delay_ms(5000);
+
+        while((PINB & 0b00001001) == 0);
+        _delay_ms(10);
+
+        set_yellow_led(1);
+        _delay_ms(1000);
+        set_yellow_led(0);
+
     }
 }
 
@@ -29,6 +38,15 @@ void init()
     /* Set the Green and Yellow LED Pins to outputs */
     DDRC |= (1 << DDC7);
     DDRD |= (1 << DDD5);
+
+    set_yellow_led(0);
+    set_green_led(0);
+    /* Button A is PB3, Button C is PB0 */
+    /* A: PCINT3, C: PCINT0 */
+    DDRB &= ~(1 << DDB3);
+    DDRB &= ~(1 << DDB0);
+
+    PORTB |= (1 << PB3);
 }
 
 void set_yellow_led(uint8_t value)
@@ -48,3 +66,4 @@ void set_green_led(uint8_t value)
     else if (value == 0)
         PORTD |= (1 << green_led);
 }
+
