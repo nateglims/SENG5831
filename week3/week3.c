@@ -3,6 +3,7 @@
 
 #define F_CPU 16000000
 #include <util/delay.h>
+#include <util/atomic.h>
 
 /* Macros */
 /* Determined via oscope measurements and trial and error. I suppose I could
@@ -141,7 +142,11 @@ int main()
     while (1)
     {
       /* Toggle the green LED based on the system time. */
-        current_time = time_ms;
+//        ATOMIC_BLOCK(ATOMIC_FORCEON)
+        {
+            current_time = time_ms;
+        }
+
         if ((current_time - previous_time) > 250) {
             PORTD ^= (1 << PORTD5);
             previous_time = current_time;

@@ -1,4 +1,6 @@
 *.hex
 *.swp
 *.o
+.DS_Store
+
 *~

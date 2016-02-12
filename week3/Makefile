@@ -1,6 +1,6 @@
 PORT=/dev/tty.usbmodem*
 MCU=atmega32u4
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os -std=c99
 LDFLAGS=-Wl,-gc-sections -Wl,-relax
 CC=avr-gcc
 TARGET=week3
