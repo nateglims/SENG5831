@@ -1,0 +1,3 @@
+[submodule "lab1/src/class-repo"]
+	path = lab1/src/class-repo
+	url = git@github.umn.edu:umn-seng-5831S16/class-repo.git
