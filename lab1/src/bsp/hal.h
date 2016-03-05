@@ -1,5 +1,7 @@
 /* Public functions */
-void initialize_hal();
+void hal_initialize();
+void hal_service();
+void delay_1sec();
 
 /* Public Types */
 typedef enum led_state {
@@ -15,5 +17,3 @@ struct LED_OFF {
   void (*toggle_state)();
   LedState (*get_state)();
 } GreenLED, RedLED, YellowLED, JitterLED;
-
-void delay_1sec();

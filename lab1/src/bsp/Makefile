@@ -1,7 +1,8 @@
 # BSP Make File.
 MCU=atmega32u4
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os -std=c99
-LDFLAGS=-Wl,-gc-sections -Wl,-relax
+INCLUDES=../../../VirtualSerial
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os -std=c99 -I$(INCLUDES)
+LDFLAGS=-Wl,-gc-sections -Wl,-relax -L$(INCLUDES) -lserial
 CC=avr-gcc
 AR=avr-ar
 TARGET=hal

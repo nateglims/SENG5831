@@ -1,5 +1,6 @@
 /* Avr Includes */
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 /* Util Includes */
 #define F_CPU 16000000
@@ -7,6 +8,7 @@
 
 /* Local Libraries */
 #include "hal.h"
+#include "VirtualSerial.h"
 
 /*** LED ***/
 
@@ -123,7 +125,7 @@ void delay_1sec()
 
 /* Initialize Hal
  */
-void initialize_hal()
+void hal_initialize()
 {
   /* Setup LEDs */
   configure_led_ports();
@@ -145,5 +147,14 @@ void initialize_hal()
   JitterLED.toggle_state = toggle_jitter_led;
   JitterLED.get_state = get_jitter_led_state;
 
-  /* */
+  /* Setup Serial */
+
+  SetupHardware();
+  sei();
+}
+
+/* Service routine for the hal. Must be called occasionally. */
+void hal_service()
+{
+  USB_Mainloop_Handler();
 }

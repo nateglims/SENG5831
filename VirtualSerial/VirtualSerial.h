@@ -35,9 +35,7 @@
 
 #ifndef _DUAL_VIRTUALSERIAL_H_
 #define _DUAL_VIRTUALSERIAL_H_
-	/* Function Prototypes: */
-		void SetupHardware(void);
-
-        void USB_Mainloop_Handler(void);
+    /* Function Prototypes: */
+    void SetupHardware(void);
+    void USB_Mainloop_Handler(void);
 #endif
-
