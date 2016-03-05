@@ -4,11 +4,6 @@
 #define F_CPU 16000000
 #include <util/delay.h>
 
-const uint16_t ocrscaler = 0x3ff;
-enum STATE { UP, DOWN } led_state;
-
-#define ASM_ROL(reg) __asm__ __volatile__("rol %0" : "=r" (reg) : "0" (reg)) 
-
 void init()
 {
     /* Setup some ports */
@@ -19,8 +14,7 @@ void init()
     TCCR1A = (1 << COM1A1) | (1 << WGM10) | (1 << WGM11);
     TCCR1B = (1 << CS10) | (1 << WGM12) ;
 
-    OCR1A = ocrscaler;
-    led_state = DOWN;
+    OCR1A = 0xff;
     /* Disable USB interrupts and enable global */
     USBCON = 0x00;
 }
@@ -31,10 +25,8 @@ int main()
 
     while (1)
     {
-        OCR1A >>= 1;
-        if (OCR1A == 0)
-            OCR1A = ocrscaler;
+        _delay_ms(100);
+        OCR1A = 0xff;;
         _delay_ms(100);
     }
 }
-
