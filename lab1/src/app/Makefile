@@ -1,4 +1,4 @@
-PORT=/dev/tty.usbmodem*
+PORT=/dev/ttyACM*
 MCU=atmega32u4
 
 # Local Library Paths

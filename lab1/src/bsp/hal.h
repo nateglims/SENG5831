@@ -1,3 +1,6 @@
+#ifndef _HAL_HEADER_GUARD_
+#define _HAL_HEADER_GUARD_
+
 /* Public functions */
 void hal_initialize();
 void hal_service();
@@ -17,3 +20,5 @@ struct LED_OFF {
   void (*toggle_state)();
   LedState (*get_state)();
 } GreenLED, RedLED, YellowLED, JitterLED;
+
+#endif /* _HAL_HEADER_GUARD_ */
