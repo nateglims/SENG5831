@@ -12,8 +12,13 @@ void hal_initialize()
   /* Setup LEDs */
   configure_led_ports();
 
+  /* Configure Button */
+  configure_button();
+
   /* Setup Serial */
   SetupHardware();
+
+  /* Enable Global Interrupts */
   sei();
 }
 
