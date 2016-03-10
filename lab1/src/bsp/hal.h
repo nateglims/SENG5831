@@ -6,19 +6,44 @@ void hal_initialize();
 void hal_service();
 void delay_1sec();
 
+/* Sort of public functions... */
+uint8_t debounce();
+
 /* Public Types */
 typedef enum led_state {
   LED_ON,
   LED_OFF,
 } LedState;
 
-LedState red_led_state, green_led_state, yellow_led_state, jitter_led_state;
+typedef enum button_state {
+    RELEASED,
+    NOT_RELEASED,
+} button_state_t;
 
-/* Function Prototyes */
-struct LED_OFF {
+LedState red_led_state, green_led_state, yellow_led_state, jitter_led_state;
+button_state_t button_a_state;
+
+/* ADT sort of things. */
+struct LED {
+    /* Private */
+    uint8_t port;
+    uint8_t pin;
+    uint8_t active_high_flag;
+    /* Public */
   void (*set_state)(LedState);
   void (*toggle_state)();
   LedState (*get_state)();
 } GreenLED, RedLED, YellowLED, JitterLED;
+
+struct BUTTON {
+    /* Private */
+    uint8_t port;
+    uint8_t pin;
+    uint8_t closed_low_flag; /* Set true if pressing the switch brings the pin to ground */
+    uint8_t (*_debounce)();
+    buttonState_t (*_get_button_state)();
+    /* Public */
+    uint8_t (*check_debounced_button)();
+} ButtonA;
 
 #endif /* _HAL_HEADER_GUARD_ */
