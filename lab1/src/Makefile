@@ -1,9 +1,9 @@
-PORT=/dev/ttyACM*
+PORT=/dev/tty.usbmodem*
 MCU=atmega32u4
 
 # Local Library Paths
-INCLUDES=../bsp ../../../VirtualSerial
-LIBS=hal VirtualSerial
+INCLUDES=../../VirtualSerial
+LIBS=VirtualSerial
 
 CINC=$(foreach d, $(INCLUDES), -I$(d))
 LDINC=$(foreach d, $(INCLUDES), -L$(d))
@@ -12,8 +12,8 @@ LIBPARAMS=$(foreach d, $(LIBS), -l$(d))
 CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os -std=c99 $(CINC)
 LDFLAGS=-Wl,-gc-sections -Wl,-relax $(LDINC) $(LIBPARAMS)
 CC=avr-gcc
-TARGET=app_main
-OBJECT_FILES=$(TARGET).o
+TARGET=main
+OBJECT_FILES=$(TARGET).o led.o time.o hough/hough.o htask.o menu.o button.o
 
 all: $(TARGET).hex
 
