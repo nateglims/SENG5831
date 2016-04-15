@@ -1,4 +1,4 @@
-PORT=/dev/tty.usbmodem*
+PORT=/dev/tty.usb*
 MCU=atmega32u4
 
 # Local Library Paths
@@ -13,7 +13,7 @@ CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) -Os -std=c99 $(CINC)
 LDFLAGS=-Wl,-gc-sections -Wl,-relax $(LDINC) $(LIBPARAMS)
 CC=avr-gcc
 TARGET=main
-OBJECT_FILES=$(TARGET).o menu.o motor.o interpolator.o 
+OBJECT_FILES=$(TARGET).o menu.o motor.o interpolator.o
 
 all: $(TARGET).hex
 

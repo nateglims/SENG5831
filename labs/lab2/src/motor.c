@@ -9,6 +9,11 @@
 static int16_t encoder_count;
 static int16_t motor_setpoint;
 
+static int16_t global_torque;
+static int16_t global_error;
+
+volatile uint8_t motor_run_flag;
+
 /* Forward declarations for private functions */
 void set_forward();
 void set_reverse();
@@ -43,6 +48,17 @@ void motor_init()
   TIMSK0 = _BV(OCIE0A);
   TCNT0 = 0;
 
+  motor_run_flag = 0;
+}
+
+void run_motor()
+{
+    motor_run_flag = 1;
+}
+
+uint8_t is_motor_running()
+{
+    return motor_run_flag;
 }
 
 /*
@@ -69,27 +85,46 @@ void set_setpoint(int16_t setpoint)
   motor_setpoint = setpoint;
 }
 
+uint16_t get_setpoint()
+{
+    return motor_setpoint;
+}
+
+/* Some debug stuff. */
+uint16_t get_torque()
+{
+    return global_torque;
+}
+
+uint16_t get_error()
+{
+    return global_error;
+}
+
+
 /* This should be called in a timer set for a period of N ms */
 int16_t update_pid(pid_gains_t * pid_gains)
 {
+    if (!motor_run_flag)
+        return 0;
+
   int16_t error;
-  int32_t torque;
+  int16_t torque;
   static int16_t last_error = 0; /* This might actually lead to a derivative kick */
   error = motor_setpoint - encoder_count;
-
   torque = pid_gains->kp * error - pid_gains->kd * (error - last_error);
   last_error = error;
 
-/*
-  USB_Mainloop_Handler();
-  printf("-----------------------------------------------------------------\r\n");
-  printf("Set Point:\t%d\r\n", motor_setpoint);
-  printf("Encoder:\t%d\r\n", encoder_count);
-  printf("Error:\t%d\r\n", error);
-  printf("Raw Torque:\t%ld\r\n", torque);
-  printf("-----------------------------------------------------------------\r\n");
-*/
+/* State management crap */
+  if (error == 0)
+  {
+    motor_run_flag = 0;
+    torque = 0;
+  }
+  global_error = error;
+  global_torque = torque;
 
+/* Motor Reversal Stuff */
   if (torque < 0)
   {
     torque = 0 - torque * -1;
@@ -111,7 +146,7 @@ int16_t update_pid(pid_gains_t * pid_gains)
     torque = 4095;
 
   /* This is where the motor becomes pretty ineffective with our settings */
-  if (torque < 110)
+  if (torque < 110 && motor_run_flag)
     torque = 110;
 
   OCR1B = torque;

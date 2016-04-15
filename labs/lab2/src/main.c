@@ -9,8 +9,7 @@
 /* App Includes */
 #include "motor.h"
 #include "VirtualSerial.h"
-
-//#include "menu.h"
+#include "menu.h"
 //#include "interpolator.h"
 
 int16_t torque;
@@ -23,6 +22,8 @@ void init()
   motor_init();
   set_setpoint(3000);
   update_gains(1,0,0, &pid_gains);
+
+  menu_init();
   sei();
 }
 
@@ -33,14 +34,7 @@ int main()
   {
     USB_Mainloop_Handler();
     printf("Main Loop.\r\n");
-    printf("Error is %d\r\n", torque);
-    printf("Position is %u\r\n", get_position());
-/*    printf("Gains are:\r\n");
-    printf("\tKp: %u\r\n", pid_gains.kp);
-    printf("\tKd: %u\r\n", pid_gains.kd);
-    printf("\tKi: %u\r\n", pid_gains.ki);
-    update_position();
-    update_gains(1, 1, 0, &pid_gains); */
+    run_menu(&pid_gains);
     _delay_ms(100);
   }
     return 0;
