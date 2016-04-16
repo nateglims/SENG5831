@@ -1,9 +1,9 @@
 1. Experiment with your system to answer the following questions.
 a. What is the degree accuracy of the encoder?
-The precision is (I think) 2400 ticks per turn. Not sure about the accuracy. Better than my eye.
+The precision is around 2200 ticks per turn. Not sure about the accuracy. Better than my eye.
 
 b. What is the minimum drive signal required to move your motor from a stopped position?
-I rekoned 105/4095. Which should be about 2.5% duty cycle.
+I found 1200/65535. Which should be about 2% duty cycle.
 
 c. What is the approximate frequency of the encoder task (i.e. PCINT ISR) at 25% duty cycle and
 75% duty cycle?
@@ -19,6 +19,8 @@ Around a period of 250ms.
     * Add in D to dampen the response and eliminate oscillation.
     * Report your final gain values.
 
+    Kp: minor overshoot appeared around 330.
+    Kd: At a Kp of 330, a Kd of 42 seemed to reliably stop the overshoot.
 
 3. Experiment with the speed and the range of reference position. Pick a “low,” “high,” and “ideal” gain based on above experiments.
     * Use each gain value to reach a reference position that is 2 full rotations from current position.
@@ -26,6 +28,37 @@ Around a period of 250ms.
     * Report on your observations, listing your “low,” “high,” and “ideal” gains.
     * Now run the same experiments, except slow your controller task frequency to 2 Hz (or 5 Hz if this is too disruptive).
     * Report on your observations.
+
+    Kp:
+     Low: 20
+     High: 500
+     Ideal: 300
+    Kd:
+     Low: 0
+     High: 100
+     Ideal: 40
+ Original, 1ms interval:
+   High:
+    2 Rotations: The motor slightly overshoots two rotations and moves back.
+    5 Degrees (approx 31 ticks): The motor did not turn on every execution, but the encoder turned quickly each time.
+   Ideal:
+    2 Rotations: The motor spun concisely.
+    5 Degrees: The encoder turned quickly. The motor did not appear to turn on each execution.
+   Low:
+    2 Rotations: The last quarter turn took a while...
+    5 Degrees: The encoder turned slower than the others, but the motor axel did not appear to move on some executions again.
+
+  2Hz timing interval:
+    High:
+      2 Rotations: The system was unstable and error oscillated from approx 3000 to -2000 encoder ticks.
+      5 Degrees: oscillated similar to the deal gain 5 degree run.
+    Ideal:
+      2 Rotations:The system was unstable and oscillated several hundred ticks around 0.
+      5 Degrees: The system was unstable and oscillated several hundred error counts above and below 0 error.
+    Low:
+      2 Rotations: The system was unstable and the motor oscillated over several ticks around 0.
+      5 Degrees: The system overshot and slowly coalesced to 0 error.
+
 
 4. Using your tuned gains (i.e. those that achieve good control while maintaining good speed) and the optimal frequency of the controller based on above experiment, implement the interpolator and execute the trajectory:
     * rotate the motor forward 90 degrees,

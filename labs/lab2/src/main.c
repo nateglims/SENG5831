@@ -20,8 +20,7 @@ void init()
   memset(&pid_gains, 0, sizeof(pid_gains));
   SetupHardware();
   motor_init();
-  set_setpoint(3000);
-  update_gains(1,0,0, &pid_gains);
+  update_gains(20, 0, 0, &pid_gains);
 
   menu_init();
   sei();
@@ -32,6 +31,7 @@ int main()
   init();
   while (1)
   {
+    set_setpoint(550);
     USB_Mainloop_Handler();
     printf("Main Loop.\r\n");
     run_menu(&pid_gains);
@@ -45,7 +45,7 @@ int main()
 /* Timer 0 - Update the torque */
 ISR(TIMER0_COMPA_vect)
 {
-  torque = update_pid(&pid_gains);
+    torque = update_pid(&pid_gains);
 }
 
 ISR(PCINT0_vect)
@@ -57,11 +57,6 @@ ISR(PCINT0_vect)
 
   current_encoder1 = (PINB & _BV(PB4)) ? 1 : 0;
   current_encoder2 = (PINB & _BV(PB5)) ? 1 : 0;
-
-/* Debugging stuff...
-  printf("C1? %d\tC2? %d\r\n", current_encoder1, current_encoder2);
-  printf("P1? %d\tP2? %d\r\n", previous_encoder1, previous_encoder2);
-*/
 
   if (current_encoder2 ^ previous_encoder1)
     update_position(1);

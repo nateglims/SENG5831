@@ -23,6 +23,7 @@ void decrease_kd(pid_gains_t * gains);
 void print_params(pid_gains_t * gains);
 void execute();
 void print_help();
+void reset_e();
 
 /* Public Functions */
 void menu_init()
@@ -80,6 +81,14 @@ void run_menu(pid_gains_t * gains)
                     execute();
                     break;
 
+                case 'q':
+                    reset_e();
+                    break;
+
+                case 'h':
+                    print_help();
+                    break;
+
                 default:
                     printf("Not a valid menu option: %x!\r\n", command);
                     break;
@@ -98,30 +107,30 @@ void set_reference_position()
 
 void increase_kp(pid_gains_t * gains)
 {
-    int8_t gain;
+    int16_t gain;
     gain = gains->kp;
-    gains->kp = gain + 10;
+    gains->kp = gain + 1;
 }
 
 void decrease_kp(pid_gains_t * gains)
 {
-    int8_t gain;
+    int16_t gain;
     gain = gains->kp;
-    gains->kp = gain - 10;
+    gains->kp = gain - 1;
 }
 
 void increase_kd(pid_gains_t * gains)
 {
-    int8_t gain;
+    int16_t gain;
     gain = gains->kd;
-    gains->kd = gain + 10;
+    gains->kd = gain + 1;
 }
 
 void decrease_kd(pid_gains_t * gains)
 {
-    int8_t gain;
+    int16_t gain;
     gain = gains->kd;
-    gains->kd = gain - 10;
+    gains->kd = gain - 1;
 }
 
 void print_params(pid_gains_t * gains)
@@ -132,8 +141,8 @@ void print_params(pid_gains_t * gains)
     printf("Kd: %d\r\n", gains->kd);
     printf("Ki: %d\r\n", gains->ki);
     printf("Setpoint: %d\r\n", get_setpoint());
-    printf("Torque setting: %d\r\n", get_torque());
-    printf("Error: %d\r\n", get_error());
+    printf("Torque setting: %ld\r\n", get_torque());
+    printf("Error: %ld\r\n", get_error());
     printf("Motor running? %s\r\n", is_motor_running() ? "Yes" : "No");
     printf("------------------------------\r\n");
 }
@@ -141,6 +150,11 @@ void print_params(pid_gains_t * gains)
 void execute()
 {
     run_motor();
+}
+
+void reset_e()
+{
+    reset_position();
 }
 
 void print_help()
@@ -154,4 +168,5 @@ void print_help()
     printf("d decrease K_d\r\n");
     printf("v View parameters\r\n");
     printf("t Execute trajectory\r\n");
+    printf("q reset encoder\r\n");
 }

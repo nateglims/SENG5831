@@ -9,8 +9,8 @@
 static int16_t encoder_count;
 static int16_t motor_setpoint;
 
-static int16_t global_torque;
-static int16_t global_error;
+static int32_t global_torque;
+static int32_t global_error;
 
 volatile uint8_t motor_run_flag;
 
@@ -28,7 +28,7 @@ void motor_init()
   /* Prep the PWM using Timer 1. This drives motor 2. */
   TCCR1A = _BV(COM1B1) | _BV(WGM11); /* WGM 11, 13 gives a mode of Phase Correct PWM */
   TCCR1B = _BV(CS10) | _BV(WGM13); /* Prescaler 1 to enable */
-  ICR1 = 0xFFF;
+  ICR1 = 0xFFFF;
   OCR1B = 0; /* Start with 0 */
   DDRB |= _BV(DDB6);
 
@@ -42,9 +42,9 @@ void motor_init()
 
 
   /* Prep the control loop timer using Timer 0 */
-  TCCR0A = _BV(WGM01);
-  TCCR0B = _BV(CS01) | _BV(CS00); /* CTC Mode */
-  OCR0A = 249; /* Between the prescaler and this, we should be at 1ms */
+  TCCR0A = _BV(WGM01); /* CTC Mode */
+  TCCR0B = _BV(CS01) | _BV(CS00); /* Prescalers. */
+  OCR0A = 255; /* Between the prescaler and this, we should be at 1ms */
   TIMSK0 = _BV(OCIE0A);
   TCNT0 = 0;
 
@@ -91,12 +91,12 @@ uint16_t get_setpoint()
 }
 
 /* Some debug stuff. */
-uint16_t get_torque()
+int32_t get_torque()
 {
     return global_torque;
 }
 
-uint16_t get_error()
+int32_t get_error()
 {
     return global_error;
 }
@@ -108,9 +108,9 @@ int16_t update_pid(pid_gains_t * pid_gains)
     if (!motor_run_flag)
         return 0;
 
-  int16_t error;
-  int16_t torque;
-  static int16_t last_error = 0; /* This might actually lead to a derivative kick */
+  int32_t error;
+  int32_t torque;
+  static int32_t last_error = 0; /* This might actually lead to a derivative kick */
   error = motor_setpoint - encoder_count;
   torque = pid_gains->kp * error - pid_gains->kd * (error - last_error);
   last_error = error;
@@ -122,12 +122,12 @@ int16_t update_pid(pid_gains_t * pid_gains)
     torque = 0;
   }
   global_error = error;
-  global_torque = torque;
+  //global_torque = torque;
 
 /* Motor Reversal Stuff */
   if (torque < 0)
   {
-    torque = 0 - torque * -1;
+    torque = 0 - torque;
     set_reverse();
   }
   else
@@ -140,20 +140,22 @@ int16_t update_pid(pid_gains_t * pid_gains)
   * reach 150% of the setpoint but still clamping the output to 100. This way
   * the controller could notify the Building Automation System of the fault. In
   * our case, since we are basically controlling position right now and not
-  * using an integrator, we should eventually be able to reduce our windup.
+  * using an integrator, we should eventually be able to reduce our windup. In
+  * this case, we have a full 32bit register for torque, but are only using 16 bits of granularity for control.
   */
-  if (torque > 4095)
-    torque = 4095;
+  if (torque > 65535)
+    torque = 65535;
 
   /* This is where the motor becomes pretty ineffective with our settings */
-  if (torque < 110 && motor_run_flag)
-    torque = 110;
+  if (torque < 1400 && motor_run_flag)
+    torque = 1400;
 
   OCR1B = torque;
+  global_torque = torque;
 
   return error; /* Really for debug purposes */
 }
-void update_gains(int8_t kp, int8_t kd, int8_t ki, pid_gains_t * gains)
+void update_gains(int16_t kp, int16_t kd, int16_t ki, pid_gains_t * gains)
 {
   gains->kp = kp;
   gains->kd = kd;
