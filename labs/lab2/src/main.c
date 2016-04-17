@@ -20,7 +20,7 @@ void init()
   memset(&pid_gains, 0, sizeof(pid_gains));
   SetupHardware();
   motor_init();
-  update_gains(20, 0, 0, &pid_gains);
+  update_gains(50, 20, 0, &pid_gains);
 
   menu_init();
   sei();
@@ -31,11 +31,31 @@ int main()
   init();
   while (1)
   {
+      /* For our interpolator we're just going to manually do this */
+    printf("Main Loop!\r\n");
+    /* First Run */
+    printf("90 Degrees forward");
     set_setpoint(550);
-    USB_Mainloop_Handler();
-    printf("Main Loop.\r\n");
-    run_menu(&pid_gains);
-    _delay_ms(100);
+    run_motor();
+    while(is_motor_running())
+        print_motor_stats_for_interpolator();
+    _delay_ms(500);
+    /* Run again */
+    printf("360 Degrees back.\r\n");
+    reset_position();
+    set_setpoint(-2200);
+    run_motor();
+    while(is_motor_running())
+        print_motor_stats_for_interpolator();
+    _delay_ms(500);
+    printf("5 degrees forward.\r\n");
+    reset_position();
+    set_setpoint(31);
+    run_motor();
+    while(is_motor_running())
+        print_motor_stats_for_interpolator();
+    /* Delay and repeat to capture the info. */
+    _delay_ms(10000);
   }
     return 0;
 }
@@ -45,7 +65,13 @@ int main()
 /* Timer 0 - Update the torque */
 ISR(TIMER0_COMPA_vect)
 {
-    torque = update_pid(&pid_gains);
+    static uint8_t counter = 0;
+    if (counter == 31)
+    {
+        torque = update_pid(&pid_gains);
+        counter = 0;
+    }
+    counter++;
 }
 
 ISR(PCINT0_vect)

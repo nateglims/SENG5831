@@ -43,7 +43,7 @@ void motor_init()
 
   /* Prep the control loop timer using Timer 0 */
   TCCR0A = _BV(WGM01); /* CTC Mode */
-  TCCR0B = _BV(CS01) | _BV(CS00); /* Prescalers. */
+  TCCR0B = _BV(CS02) | _BV(CS00); /* Prescalers. */
   OCR0A = 255; /* Between the prescaler and this, we should be at 1ms */
   TIMSK0 = _BV(OCIE0A);
   TCNT0 = 0;
@@ -102,6 +102,14 @@ int32_t get_error()
 }
 
 
+void print_motor_stats_for_interpolator()
+{
+      USB_Mainloop_Handler();
+      printf("T: %ld\r\n", global_torque);
+      printf("Pr: %d\r\n", motor_setpoint);
+      printf("Pm: %d\r\n", encoder_count);
+}
+
 /* This should be called in a timer set for a period of N ms */
 int16_t update_pid(pid_gains_t * pid_gains)
 {
@@ -122,7 +130,7 @@ int16_t update_pid(pid_gains_t * pid_gains)
     torque = 0;
   }
   global_error = error;
-  //global_torque = torque;
+  global_torque = torque;
 
 /* Motor Reversal Stuff */
   if (torque < 0)
@@ -151,7 +159,6 @@ int16_t update_pid(pid_gains_t * pid_gains)
     torque = 1400;
 
   OCR1B = torque;
-  global_torque = torque;
 
   return error; /* Really for debug purposes */
 }

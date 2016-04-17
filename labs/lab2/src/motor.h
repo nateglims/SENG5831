@@ -22,6 +22,7 @@ int32_t get_error();
 int32_t get_torque();
 void run_motor();
 uint8_t is_motor_running();
+void print_motor_stats_for_interpolator();
 
 int16_t update_pid(pid_gains_t * pid_gains);
 void update_gains(int16_t kp, int16_t kd, int16_t ki, pid_gains_t * gains);

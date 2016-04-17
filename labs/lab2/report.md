@@ -69,3 +69,9 @@ Around a period of 250ms.
 a. Graph Pm, Pr and T t hat was recorded while executing the trajectory. Be sure to graph the entire trajectory.  “While” means to record while executing but you don’t need to graph in real­time. You can do a screen dump of the data, then cut and paste into a file or send to a file. Use Excel or Open Office or whatever is your favorite/easiest graphing app to generate the plots.
 b. Execute the same trajectory described above, except run your PD controller at a "slow" rate and at a "very slow" rate while graphing the same variables. Discuss the results.
 c. Explain the observed behavior.
+
+Data was gathered by doing "cat PORT > file.txt" and running the convert.py script to export it to CSV, then graphed in libre. Note that the dead times are missing because of how printing data, delays, and motor execution worked out.
+
+The fast rate can be seen in fast_rate_interpolator.png. There is some overshoot. This was hard to determine visually or with debug output. In retrospect, the ideal gains above are probably not critically dampened.
+
+The slow rate can be seen in 2hz_interopolator.png. The motor cannot make it past the initial 90 degree turn. The dampening in oscillation seen toward the end is me holding the encoder with my hand to dampen it. It hurt. Would not recommend.
